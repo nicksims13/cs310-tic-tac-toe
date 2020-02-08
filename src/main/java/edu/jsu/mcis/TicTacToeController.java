@@ -1,6 +1,12 @@
 package edu.jsu.mcis;
 
-public class TicTacToeController {
+import javax.swing.JButton;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TicTacToeController implements ActionListener {
 
     private final TicTacToeModel model;
     private final TicTacToeView view;
@@ -12,37 +18,45 @@ public class TicTacToeController {
         /* Initialize model, view, and width */
 
         model = new TicTacToeModel(width);
-        view = new TicTacToeView();
+        view = new TicTacToeView(width, this);
         
     }
 
-    public void start() {
-    
-        /* MAIN LOOP (repeats until game is over) */
+    public String getMarkAsString(int row, int col) { 
 
-        /* Display the board using the View's "showBoard()", then use
-           "getNextMove()" to get the next move from the player.  Enter
-           the move (using the Model's "makeMark()", or display an error
-           using the View's "showInputError()" if the move is invalid. */
+        return (model.getMark(row, col).toString());       
+    }
+   
+    public Component getView() { 
 
-        while (!model.isGameover()){
+        return view;       
+    }
 
-            view.showBoard(model.toString());
+    @Override
 
-            TicTacToeMove move = view.getNextMove(model.isXTurn());
+    public void actionPerformed(ActionEvent e) {
 
-            if (!model.makeMark(move.getRow(), move.getCol())){
-                view.showInputError();
-            }
+        String name = ((JButton) e.getSource()).getName();
 
+        int row = Integer.parseInt(String.valueOf(name.charAt(6)));
+        int col = Integer.parseInt(String.valueOf(name.charAt(7)));
+
+        view.updateSquares();
+
+        if (model.makeMark(row, col) == true){
+
+            view.updateSquares();
         }
-        
-        /* After the game is over, show the final board and the winner */
 
-        view.showBoard(model.toString());
+        for (int i = 0; i < view.board.length; i++){
 
-        view.showResult(model.getResult().toString());
-        
+            for (int j = 0; j < view.board.length; j++){
+
+                if (model.isGameover() == true){
+                    view.showResult(model.getResult().toString());
+                    view.board[i][j].setEnabled(false);
+                }
+            }
+        }
     }
-
 }
